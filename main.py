@@ -1,21 +1,3 @@
-# import pandas as pd
-# import seaborn as sns
-# import matplotlib.pyplot as plt
-
-# df = pd.read_csv('../data/wine.data')
-# df = pd.read_csv('../data/dataR2.csv')
-# print(df.head())
-
-
-# sns.distplot(df.values[1], kde=False)
-# sns.distplot(df["Classification"], kde=False, bins=40)
-
-# sns.swarmplot(x="Classification", y="BMI", data=df)
-# sns.violinplot(x = "BMI", y="Age",hue = 'Classification', data = df)
-# sns.regplot(x="BMI", y="Age",data=df)
-# plt.show()
-"""Old code
-"""
 from data import DataLoader
 from model import AutoEncoder
 from model import NeuralNetwork
@@ -23,20 +5,20 @@ from helper import lineplot
 
 
 def run(data_obj, training_size):
+
     data_obj.split_dataset(training_size)
     data_obj.preprocess()
 
+    #-------------------------------- Autoencoder model
     ae_model = AutoEncoder(data_obj.x_train_scaled.shape[1],
                            training_size, data_obj.name)
     ae_model.train(data_obj.x_train_scaled, data_obj.x_val_scaled)
 
+    #-------------------------------- Encoded representation
     x_train_encoded, x_val_encoded, x_test_encoded = ae_model.encoded_data(
         data_obj.x_train_scaled, data_obj.x_val_scaled, data_obj.x_test_scaled)
 
-    # print((data_obj.y_train.shape[1]))
-    # print(len(data_obj.y_train['target'].unique()))
-    # print("-"*80)
-    # print(data_obj.y_train)
+    #-------------------------------- Neural Network model
     nn_model = NeuralNetwork(
         data_obj.x_train_scaled.shape[1], data_obj.y_train.shape[1],
         training_size, data_obj.name)
@@ -44,6 +26,7 @@ def run(data_obj, training_size):
         x_train_encoded, data_obj.y_train, x_val_encoded, data_obj.y_val)
     nn_model.evaluate(x_test_encoded, data_obj.y_test)
 
+    #-------------------------------- reset data from memory
     data_obj.reset_scalar()
 
     return nn_model.result()
@@ -52,7 +35,7 @@ def run(data_obj, training_size):
 if __name__ == '__main__':
 
     from data import preprocess_dataR2, preprocess_wine, preprocess_audit 
-
+    #-------------------------------- custome loader for diferent dataset
     dataset_config = [
         ('breast_cancer', 'data/dataR2.csv', preprocess_dataR2),
         ('wine', 'data/wine.data', preprocess_wine),
@@ -61,41 +44,25 @@ if __name__ == '__main__':
      ]
 
     for dataset_name, dataset_path, preprocess in dataset_config:
+    #------------------------------------------------ custome data loader
         data_obj = DataLoader(dataset_name, dataset_path, preprocess)
 
         val_result, test_result = [], []
         training_sizes = [.2, .3, .4, .5, .6, .7, 0.8, 0.9]
+    #--------------------------------  diferent size for autoencoder dataset
 
         for training_size in training_sizes:
             temp = run(data_obj, training_size)
             val_result.append(temp[0])
             test_result.append(temp[1])
 
+    #-------------------------------- Plot the results
         lineplot(training_sizes, val_result, test_result)
     # print(dataset)
 
 """
-Notes:
-Dataset analysis:
- - dataset distribution for different class
- - feature distribution
- - explority analysis
- ? correlation between feature (PCA)
-
-Model building:
- -AutoEncoder:
-  * standarde size for autoencoder layers and number of neurons
-  * 
- - Neural netork:
-  * single hidden layer
-  * equal to the number of bottle neck layers neurons
-  *   
-
-TODO:
- - new dataset apapter
-
-
 Done
+ - new dataset apapter
 - compare results
 - diffferent size of dataset split to give to auto encoder 
 - save the best model

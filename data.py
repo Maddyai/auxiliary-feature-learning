@@ -9,10 +9,7 @@ import pandas as pd
 
 def preprocess_dataR2(df):
     x = df.drop('Classification', axis=1)
-    # y = df['Classification']
-    # one hot encoding
     y = pd.get_dummies(df['Classification'], drop_first=True)
-    # y.columns = ["target"]
     return x, y
 
 

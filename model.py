@@ -6,6 +6,7 @@ import os.path
 
 class Base(object):
     def __init__(self):
+        # autoencoder layer structure 
         self.layer_size = (0.9, 0.75, 0.6)
 
 
@@ -79,18 +80,8 @@ class NeuralNetwork(Base):
             ModelCheckpoint(filepath=self.model_name,
                             monitor='val_acc', save_best_only=True)]
 
-        ''' ------------------------------Stacked auto encoder that
-        compresses the data to lower dimention '''
+        ''' ------------------------------NN with 3 layers'''
 
-        # input_lyr = Input(shape=(input_shape,))
-        # hidden_lyr = Dense(int(input_shape), activation='sigmoid')(input_lyr)
-        # hidden_lyr = Dense(int(input_shape), activation='sigmoid')(hidden_lyr)
-        # output_lyr = Dense(output_shape, activation='softmax')(hidden_lyr)
-
-        # self.nn_model = Model(input_lyr, output_lyr)
-        # # self.nn_model.compile(optimizer='adam', loss='mean_squared_error')
-        # self.nn_model.compile(loss='binary_crossentropy', optimizer='adam',
-        #                       metrics=['accuracy'])
         from keras.models import Sequential
         from keras.layers import Dense, Dropout
         self.nn_model = Sequential()
