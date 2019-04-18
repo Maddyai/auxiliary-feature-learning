@@ -10,11 +10,11 @@ class Base(object):
 
 
 class AutoEncoder(Base):
-    def __init__(self, input_shape, training_size):
+    def __init__(self, input_shape, training_size, name):
         super().__init__()
 
         # -----------------------------Stopping Criteria
-        self.model_name = 'models/best_autoencoder_model_'
+        self.model_name = name + '/best_autoencoder_model_'
         self.model_name += 'train_size_' + str(training_size) + '_'
         for suffix in self.layer_size:
             self.model_name += str(suffix)
@@ -60,12 +60,17 @@ class AutoEncoder(Base):
 
 
 class NeuralNetwork(Base):
-    def __init__(self, input_shape, output_shape, training_size):
+    def __init__(self, input_shape, output_shape, training_size, name):
         super().__init__()
         input_shape = int(input_shape*self.layer_size[-1])
+        final_act = "softmax"
+        loss = "categorical_crossentropy"
+        if (output_shape == 1):
+            final_act = "sigmoid"
+            loss = "binary_crossentropy"
 
         # -----------------------------Stopping Criteria
-        self.model_name = 'models/best_neuralnetwork_model'
+        self.model_name = name + '/best_neuralnetwork_model'
         self.model_name += 'train_size_' + str(training_size) + '_'
         self.model_name += '.h5'
 
@@ -93,10 +98,10 @@ class NeuralNetwork(Base):
         # self.nn_model.add(Dropout(0.5))
         self.nn_model.add(Dense(input_shape, activation='relu'))
         # self.nn_model.add(Dropout(0.5))
-        self.nn_model.add(Dense(output_shape, activation='sigmoid'))
+        self.nn_model.add(Dense(output_shape, activation=final_act))
 
-        self.nn_model.compile(loss='binary_crossentropy',
-                              optimizer='adam', metrics=['accuracy'])
+        self.nn_model.compile(loss=loss, optimizer='adam',
+                              metrics=['accuracy'])
 
     def train(self, x_train, y_train, x_val, y_val):
         if not os.path.isfile(self.model_name):

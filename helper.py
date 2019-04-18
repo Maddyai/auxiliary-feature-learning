@@ -59,10 +59,15 @@ def vnum_dist(df):
 
 
 # %matplotlib inline
-def lineplot(dataset):
+def lineplot(training_sizes, val_result, test_result):
+    import pandas as pd
+    dataset = pd.DataFrame({'Training Size': training_sizes + training_sizes,
+                            'Accuracy': val_result + test_result,
+                            'Dataset': [
+                               'Validation' for _ in range(len(training_sizes))] +
+                            ['Test' for _ in range(len(training_sizes))],
+                            })
+
     sns.lineplot(x='Training Size', y='Accuracy', data=dataset,
                  markers=True, hue='Dataset')
-    # sns.lineplot(x='Training Size', y='Accuracy', data=dataset2, color='r')
-    # labels = ax.get_xticklabels() 
-    # ax.set_xticklabels(labels, rotation=-30)
     plt.show()
